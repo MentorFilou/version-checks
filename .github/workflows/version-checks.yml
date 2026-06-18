@@ -1,0 +1,131 @@
+name: Version Checks
+
+# Reusable-workflow wrapper around the composite action in this repo's action.yml.
+# Use it for a zero-boilerplate, self-contained job (checkout + parallel checks):
+#
+#   jobs:
+#     version-checks:
+#       uses: OWNER/version-checks/.github/workflows/version-checks.yml@v1
+#       permissions:
+#         contents: read
+#         pull-requests: write
+#
+# Prefer the composite action directly (uses: OWNER/version-checks@v1 as a step)
+# when you want to run it inside your own job alongside other steps.
+#
+# Each job checks out the caller's code, then checks out this repo's action at
+# the exact commit this workflow was loaded from (job.workflow_sha) and runs it
+# locally (./.version-checks). 'uses:' cannot take an expression, so this is how
+# the action version is kept in lockstep with the pinned workflow version.
+
+on:
+  workflow_call:
+    inputs:
+      check-actions:
+        type: boolean
+        default: true
+      check-npm:
+        type: boolean
+        default: true
+      check-runtime:
+        type: boolean
+        default: true
+      runner:
+        type: string
+        default: ubuntu-24.04
+      node-version-file:
+        type: string
+        default: package.json
+      pnpm-version:
+        type: string
+        default: ""
+
+jobs:
+  check-action-versions:
+    name: Check GitHub Action versions
+    if: ${{ inputs.check-actions }}
+    runs-on: ${{ inputs.runner }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout calling repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Resolve version-checks repository
+        id: tool
+        run: echo "repo=$(echo '${{ job.workflow_ref }}' | cut -d/ -f1-2)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout version-checks action
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ steps.tool.outputs.repo }}
+          ref: ${{ job.workflow_sha }}
+          path: .version-checks
+
+      - name: Run action version checks
+        uses: ./.version-checks
+        with:
+          check-actions: "true"
+          check-npm: "false"
+          check-runtime: "false"
+
+  check-npm-versions:
+    name: Check npm dependency versions
+    if: ${{ inputs.check-npm }}
+    runs-on: ${{ inputs.runner }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout calling repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Resolve version-checks repository
+        id: tool
+        run: echo "repo=$(echo '${{ job.workflow_ref }}' | cut -d/ -f1-2)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout version-checks action
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ steps.tool.outputs.repo }}
+          ref: ${{ job.workflow_sha }}
+          path: .version-checks
+
+      - name: Run npm version checks
+        uses: ./.version-checks
+        with:
+          check-actions: "false"
+          check-npm: "true"
+          check-runtime: "false"
+          node-version-file: ${{ inputs.node-version-file }}
+          pnpm-version: ${{ inputs.pnpm-version }}
+
+  check-runtime-versions:
+    name: Check NODE / PNPM / runner version consistency
+    if: ${{ inputs.check-runtime }}
+    runs-on: ${{ inputs.runner }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout calling repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Resolve version-checks repository
+        id: tool
+        run: echo "repo=$(echo '${{ job.workflow_ref }}' | cut -d/ -f1-2)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout version-checks action
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ steps.tool.outputs.repo }}
+          ref: ${{ job.workflow_sha }}
+          path: .version-checks
+
+      - name: Run runtime version checks
+        uses: ./.version-checks
+        with:
+          check-actions: "false"
+          check-npm: "false"
+          check-runtime: "true"
