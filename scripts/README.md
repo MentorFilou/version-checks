@@ -1,9 +1,10 @@
 # `scripts/`
 
-These scripts are the engine behind the reusable workflow defined in
-`.github/workflows/version-checks.yml`. The workflow checks them out into
-`.version-checks/scripts/` in the calling repository and runs them against that
-repository's files. See the [root README](../README.md) for consumer usage.
+These scripts are the engine behind the composite action defined in
+[`action.yml`](../action.yml) (and the reusable-workflow wrapper in
+`.github/workflows/version-checks.yml`). The action locates them via
+`$GITHUB_ACTION_PATH` and runs them against the calling repository's checked-out
+files. See the [root README](../README.md) for consumer usage.
 
 They check some versions for ...
 
