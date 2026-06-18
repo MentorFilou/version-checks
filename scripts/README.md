@@ -1,10 +1,11 @@
-# `./github/scripts/version-checks/`
+# `scripts/`
 
-This folder solely serves `.github/workflows/version-checks.yml` providing different scripts for all the tasks in its jobs.
+These scripts are the engine behind the reusable workflow defined in
+`.github/workflows/version-checks.yml`. The workflow checks them out into
+`.version-checks/scripts/` in the calling repository and runs them against that
+repository's files. See the [root README](../README.md) for consumer usage.
 
-You can locally run the _important parts_ of this workflow by using `pnpm run check:versions`
-
-That workflow checks some versions for ...
+They check some versions for ...
 
 1. updates (resulting in WARNs)
 2. using the same across multiple places (resulting in FAILs)
@@ -22,4 +23,10 @@ This is currently scanned in:
 
 It serves the result as errors (failing the job) or warnings; depending on type of check - both will lead to a helpful bot-comment on the PR thats consistently being updated whenever the job runs again.
 
-> If you know this version-checks/ script setup from another repository, note that the version in [this repository](../../../README.md) does NOT include Docker checks. These were intentionally removed as we're not using any Docker files here.
+Each `scan_*` script writes intermediate JSON to the system temp dir, which the
+matching `post_*` / `fail_on_*` scripts read — so they must run in the same job.
+The scripts depend only on the Python standard library, plus the `pnpm` CLI for
+the npm check.
+
+> This version-checks setup does NOT include Docker checks. Earlier copies in
+> other repositories may differ.
