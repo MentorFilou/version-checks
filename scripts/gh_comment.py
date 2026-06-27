@@ -20,8 +20,34 @@ def cell(value):
     `^20 || >=22` version range) splits into bogus columns and mangles the row.
     Escaping it as `\\|` makes it render literally. Newlines (\\n and \\r) are
     flattened to spaces since either would otherwise terminate the row.
+
+    Backticks are not handled here — use code() for values that are rendered
+    inside an inline code span, since escaping a backtick requires owning the
+    span delimiters.
     """
     return str(value).replace("|", "\\|").replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
+
+
+def code(value):
+    """Render a value as an inline code span that is safe in a table cell.
+
+    Returns the value wrapped in its own backtick delimiters, so callers write
+    `code(x)` rather than `` `{cell(x)}` ``. On top of the `|`/newline escaping
+    that cell() does, this picks a backtick fence longer than any run of
+    backticks in the value (and space-pads when the value starts or ends with
+    one) per the CommonMark code-span rules, so a value containing a backtick
+    still renders literally instead of closing the span early.
+    """
+    s = cell(value)
+    if s == "":
+        return "``"
+    longest = run = 0
+    for ch in s:
+        run = run + 1 if ch == "`" else 0
+        longest = max(longest, run)
+    fence = "`" * (longest + 1)
+    pad = " " if s.startswith("`") or s.endswith("`") else ""
+    return f"{fence}{pad}{s}{pad}{fence}"
 
 
 def _headers():

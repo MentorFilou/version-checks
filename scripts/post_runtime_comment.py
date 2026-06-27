@@ -51,9 +51,9 @@ try:
         for c in conflicts:
             for e in c["entries"]:
                 rows.append(
-                    f'| `{gh_comment.cell(c["runtime"].upper())}`'
-                    f' | `{gh_comment.cell(e["version"])}`'
-                    f' | `{gh_comment.cell(e["label"])}` |'
+                    f'| {gh_comment.code(c["runtime"].upper())}'
+                    f' | {gh_comment.code(e["version"])}'
+                    f' | {gh_comment.code(e["label"])} |'
                 )
         body = "\n".join([
             MARKER_CONFLICT,
@@ -88,9 +88,9 @@ try:
         for w in version_warnings:
             runtime = w["type"].replace("-outdated", "").upper()
             rows.append(
-                f'| `{gh_comment.cell(runtime)}`'
-                f' | `{gh_comment.cell(w["current"])}`'
-                f' | `{gh_comment.cell(w["latest"])}` |'
+                f'| {gh_comment.code(runtime)}'
+                f' | {gh_comment.code(w["current"])}'
+                f' | {gh_comment.code(w["latest"])} |'
             )
         body = "\n".join([
             MARKER_OUTDATED,
@@ -124,8 +124,8 @@ try:
         ]
         for e in w["entries"]:
             rows.append(
-                f'| `{gh_comment.cell(e["runner"])}`'
-                f' | `{gh_comment.cell(e["ann_file"])}`'
+                f'| {gh_comment.code(e["runner"])}'
+                f' | {gh_comment.code(e["ann_file"])}'
                 f' | {gh_comment.cell(e["ann_line"])} |'
             )
         body = "\n".join([
@@ -133,7 +133,7 @@ try:
             "## ⚠️ Inconsistent Runner Versions",
             "",
             f"Workflow files use multiple Ubuntu runner versions: "
-            f"{', '.join(f'`{v}`' for v in w['found'])}. "
+            f"{', '.join(gh_comment.code(v) for v in w['found'])}. "
             "Mixing `ubuntu-latest` with a pinned version can cause hard-to-reproduce "
             "failures when the `latest` label advances. These do not block merging.",
             "",

@@ -50,8 +50,8 @@ try:
         for c in conflicts:
             for u in c["usages"]:
                 rows.append(
-                    f'| `{gh_comment.cell(c["action"])}` | `{gh_comment.cell(u["file"])}` | {gh_comment.cell(u["line"])}'
-                    f' | `{gh_comment.cell(u["ref"][:12])}...` | `{gh_comment.cell(u["comment"])}` |'
+                    f'| {gh_comment.code(c["action"])} | {gh_comment.code(u["file"])} | {gh_comment.cell(u["line"])}'
+                    f' | {gh_comment.code(u["ref"][:12] + "...")} | {gh_comment.code(u["comment"])} |'
                 )
         body = "\n".join([
             MARKER_CONFLICT,
@@ -81,8 +81,8 @@ try:
         ]
         for e in not_sha_pinned:
             rows.append(
-                f'| `{gh_comment.cell(e["action"])}` | `{gh_comment.cell(e["file"])}`'
-                f' | {gh_comment.cell(e["line"])} | `{gh_comment.cell(e["ref"])}` |'
+                f'| {gh_comment.code(e["action"])} | {gh_comment.code(e["file"])}'
+                f' | {gh_comment.cell(e["line"])} | {gh_comment.code(e["ref"])} |'
             )
         body = "\n".join([
             MARKER_NOT_PINNED,
@@ -113,9 +113,9 @@ try:
         ]
         for m in mismatches:
             rows.append(
-                f'| `{gh_comment.cell(m["action"])}` | `{gh_comment.cell(m["file"])}` | {gh_comment.cell(m["line"])}'
-                f' | `{gh_comment.cell(m["pinned_sha"][:12])}...` | `{gh_comment.cell(m["comment"])}`'
-                f' | `{gh_comment.cell(m["resolved_sha"][:12])}...` |'
+                f'| {gh_comment.code(m["action"])} | {gh_comment.code(m["file"])} | {gh_comment.cell(m["line"])}'
+                f' | {gh_comment.code(m["pinned_sha"][:12] + "...")} | {gh_comment.code(m["comment"])}'
+                f' | {gh_comment.code(m["resolved_sha"][:12] + "...")} |'
             )
         body = "\n".join([
             MARKER_SHA,
@@ -145,12 +145,12 @@ try:
         ]
         for o in outdated:
             locations = ", ".join(
-                f'`{gh_comment.cell(u["file"])}:{gh_comment.cell(u["line"])}`'
+                gh_comment.code(f'{u["file"]}:{u["line"]}')
                 for u in o["usages"]
             )
             rows.append(
-                f'| `{gh_comment.cell(o["action"])}` | `{gh_comment.cell(o["current"])}`'
-                f' | `{gh_comment.cell(o["latest"])}` | {locations} |'
+                f'| {gh_comment.code(o["action"])} | {gh_comment.code(o["current"])}'
+                f' | {gh_comment.code(o["latest"])} | {locations} |'
             )
         body = "\n".join([
             MARKER_OUTDATED,
