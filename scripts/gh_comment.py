@@ -18,10 +18,10 @@ def cell(value):
     GitHub treats `|` as a column separator even inside backticks, so any
     dynamic value containing one (e.g. `inputs.runner || 'ubuntu-24.04'` or a
     `^20 || >=22` version range) splits into bogus columns and mangles the row.
-    Escaping it as `\\|` makes it render literally. Newlines are also flattened
-    since they would otherwise terminate the row.
+    Escaping it as `\\|` makes it render literally. Newlines (\\n and \\r) are
+    flattened to spaces since either would otherwise terminate the row.
     """
-    return str(value).replace("|", "\\|").replace("\n", " ")
+    return str(value).replace("|", "\\|").replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
 
 
 def _headers():
