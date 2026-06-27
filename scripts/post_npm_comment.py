@@ -33,7 +33,10 @@ try:
             released = o.get("released", "unknown")
             if o.get("too_young"):
                 released += " _(too young for pnpm)_"
-            rows.append(f'| `{o["package"]}` | `{o["current"]}` | `{o["latest"]}` | {released} |')
+            rows.append(
+                f'| `{gh_comment.cell(o["package"])}` | `{gh_comment.cell(o["current"])}`'
+                f' | `{gh_comment.cell(o["latest"])}` | {released} |'
+            )
         body = "\n".join([
             MARKER,
             "## ⚠️ Outdated npm Dependencies",

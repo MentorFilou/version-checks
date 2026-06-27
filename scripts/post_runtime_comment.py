@@ -50,7 +50,11 @@ try:
         ]
         for c in conflicts:
             for e in c["entries"]:
-                rows.append(f'| `{c["runtime"].upper()}` | `{e["version"]}` | `{e["label"]}` |')
+                rows.append(
+                    f'| `{gh_comment.cell(c["runtime"].upper())}`'
+                    f' | `{gh_comment.cell(e["version"])}`'
+                    f' | `{gh_comment.cell(e["label"])}` |'
+                )
         body = "\n".join([
             MARKER_CONFLICT,
             "## ❌ Runtime Version Conflict",
@@ -83,7 +87,11 @@ try:
         ]
         for w in version_warnings:
             runtime = w["type"].replace("-outdated", "").upper()
-            rows.append(f'| `{runtime}` | `{w["current"]}` | `{w["latest"]}` |')
+            rows.append(
+                f'| `{gh_comment.cell(runtime)}`'
+                f' | `{gh_comment.cell(w["current"])}`'
+                f' | `{gh_comment.cell(w["latest"])}` |'
+            )
         body = "\n".join([
             MARKER_OUTDATED,
             "## ⚠️ Outdated Runtime Versions",
@@ -115,7 +123,11 @@ try:
             "|--------|------|------|",
         ]
         for e in w["entries"]:
-            rows.append(f'| `{e["runner"]}` | `{e["ann_file"]}` | {e["ann_line"]} |')
+            rows.append(
+                f'| `{gh_comment.cell(e["runner"])}`'
+                f' | `{gh_comment.cell(e["ann_file"])}`'
+                f' | {gh_comment.cell(e["ann_line"])} |'
+            )
         body = "\n".join([
             MARKER_RUNNER,
             "## ⚠️ Inconsistent Runner Versions",
